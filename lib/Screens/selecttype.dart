@@ -13,7 +13,7 @@ class Selected extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Blood Donation Application',
+          'Dynamic_Location_Based_Blood_Application',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.red,

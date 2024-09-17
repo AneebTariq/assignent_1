@@ -1,12 +1,13 @@
-import 'package:assignmen_1/Screens/Accepter/accepter_history.dart';
-import 'package:assignmen_1/Screens/donor/donor_history.dart';
+import 'package:assignmen_1/Screens/donor/donor_incomplete_requests.dart';
 import 'package:assignmen_1/Screens/selecttype.dart';
+import 'package:assignmen_1/shared_pref/shared_pref.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../notification.dart';
+import 'donor_history.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -51,13 +52,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
             UserAccountsDrawerHeader(
               decoration: const BoxDecoration(color: Colors.red),
               accountName: const Text('  '),
+              currentAccountPicture: Container(
+                width: 170.0,
+                height: 170.0,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(
+                    color: Colors.red,
+                    width: 6.0,
+                  ),
+                  shape: BoxShape.circle,
+                  image: const DecorationImage(
+                    image: AssetImage('assets/images/donor.png'),
+                  ),
+                ),
+              ),
               accountEmail: Text(mydonor),
             ),
             ListTile(
               leading: const Icon(Icons.home),
               title: const Text(
-                ' H o m e ',
-                style: TextStyle(fontSize: 18),
+                ' Home ',
+                style: TextStyle(fontSize: 20),
               ),
               onTap: () {
                 Get.offAll(() => const Selected());
@@ -66,18 +82,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ListTile(
               leading: const Icon(Icons.message_outlined),
               title: const Text(
-                ' I n c o m p l e t e ',
-                style: TextStyle(fontSize: 18),
+                ' Incomplete Requests ',
+                style: TextStyle(fontSize: 20),
               ),
               onTap: () {
-                Get.to(() => const Donorhistory());
+                Get.to(() => const Donorincomphistory());
               },
             ),
             ListTile(
               leading: const Icon(Icons.notifications_active),
               title: const Text(
-                'V i e w    R e q u e s t s ',
-                style: TextStyle(fontSize: 18),
+                'View Requests ',
+                style: TextStyle(fontSize: 20),
               ),
               onTap: () {
                 Get.to(() => const Donornotification());
@@ -89,12 +105,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ListTile(
               leading: const Icon(Icons.message_outlined),
               title: const Text(
-                ' H i s t o r y ',
-                style: TextStyle(fontSize: 18),
+                ' History ',
+                style: TextStyle(fontSize: 20),
               ),
               onTap: () {
                 FirebaseAuth.instance.signOut();
-                Get.to(() => const Accepterhistory());
+                Get.to(() => const Donorhistory());
               },
             ),
             ListTile(
@@ -103,8 +119,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ' L o g o u t ',
                 style: TextStyle(fontSize: 18),
               ),
-              onTap: () {
+              onTap: () async {
                 FirebaseAuth.instance.signOut();
+                await SharedPrefClient().clearUser();
                 Get.to(() => const Selected());
               },
             ),
@@ -114,49 +131,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         title: const Text('Profile'),
         backgroundColor: Colors.red,
+        elevation: 0,
       ),
       body: Column(
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Status'),
-                Switch(
-                    activeColor: Colors.green,
-                    inactiveTrackColor: Colors.red,
-                    value: value,
-                    onChanged: (onchange) {
-                      setState(() {
-                        value = onchange;
-                      });
-                    })
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-              top: 10.0,
-              bottom: 10,
-            ),
-            child: Container(
-              width: 170.0,
-              height: 170.0,
-              decoration: BoxDecoration(
-                border: Border.all(
+          Stack(
+            children: [
+              Container(
+                height: 250,
+                width: MediaQuery.of(context).size.width,
+                decoration: const BoxDecoration(
                   color: Colors.red,
-                  width: 6.0,
-                ),
-                shape: BoxShape.circle,
-                image: const DecorationImage(
-                  image: AssetImage('assets/images/donor.png'),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30),
+                  ),
                 ),
               ),
-            ),
+              Positioned(
+                top: 10,
+                left: 100,
+                right: 100,
+                child: Container(
+                  width: 170.0,
+                  height: 170.0,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                      color: Colors.red,
+                      width: 6.0,
+                    ),
+                    shape: BoxShape.circle,
+                    image: const DecorationImage(
+                      image: AssetImage('assets/images/donor.png'),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(
-            height: 20,
+            height: 10,
           ),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
@@ -181,16 +196,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               horizontal: 10,
                             ),
                             child: Card(
-                              elevation: 15,
+                              elevation: 5,
                               borderOnForeground: true,
-                              child: ListTile(
-                                leading: const Icon(Icons.person),
-                                iconColor: Colors.red,
-                                title: Text(
-                                  snapshot.data!.docs[index]['Name'],
-                                  style: const TextStyle(
-                                    color: Colors.red,
-                                    fontSize: 20.0,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child: ListTile(
+                                  leading: const Icon(Icons.person),
+                                  iconColor: Colors.red,
+                                  title: const Text(
+                                    'Name ',
+                                    style: TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 20.0,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  subtitle: Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 40.0,
+                                      top: 10,
+                                    ),
+                                    child: Text(
+                                      snapshot.data!.docs[index]['Name'],
+                                      style: const TextStyle(
+                                        fontSize: 18.0,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -202,18 +233,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               horizontal: 10,
                             ),
                             child: Card(
-                              elevation: 15,
+                              elevation: 5,
                               borderOnForeground: true,
-                              child: ListTile(
-                                leading: const Icon(
-                                  Icons.mail,
-                                ),
-                                iconColor: Colors.blue,
-                                title: Text(
-                                  snapshot.data!.docs[index]['Donoremail'],
-                                  style: const TextStyle(
-                                    color: Colors.blue,
-                                    fontSize: 20.0,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10.0),
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.mail,
+                                  ),
+                                  iconColor: Colors.red,
+                                  title: const Text(
+                                    'Email',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  subtitle: Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 10.0,
+                                      left: 40,
+                                    ),
+                                    child: Text(
+                                      snapshot.data!.docs[index]['Donoremail'],
+                                      style: const TextStyle(
+                                        fontSize: 18.0,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -225,16 +273,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               horizontal: 10,
                             ),
                             child: Card(
-                              elevation: 15,
+                              elevation: 5,
                               borderOnForeground: true,
-                              child: ListTile(
-                                leading: const Icon(Icons.person_2),
-                                iconColor: Colors.green,
-                                title: Text(
-                                  snapshot.data!.docs[index]['Number'],
-                                  style: const TextStyle(
-                                    color: Colors.green,
-                                    fontSize: 20.0,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10.0),
+                                child: ListTile(
+                                  leading: const Icon(Icons.phone_android),
+                                  iconColor: Colors.red,
+                                  title: const Text(
+                                    'Number',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  subtitle: Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 10.0,
+                                      left: 40,
+                                    ),
+                                    child: Text(
+                                      snapshot.data!.docs[index]['Number'],
+                                      style: const TextStyle(
+                                        fontSize: 18.0,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -246,16 +311,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               horizontal: 10,
                             ),
                             child: Card(
-                              elevation: 15,
+                              elevation: 5,
                               borderOnForeground: true,
-                              child: ListTile(
-                                leading: const Icon(Icons.bloodtype),
-                                iconColor: Colors.red,
-                                title: Text(
-                                  snapshot.data!.docs[index]['Blood Group'],
-                                  style: const TextStyle(
-                                    color: Colors.red,
-                                    fontSize: 20.0,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10.0),
+                                child: ListTile(
+                                  leading: const Icon(Icons.bloodtype),
+                                  iconColor: Colors.red,
+                                  title: const Text(
+                                    'Blood Group',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20.0,
+                                    ),
+                                  ),
+                                  subtitle: Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 10.0,
+                                      left: 40,
+                                    ),
+                                    child: Text(
+                                      snapshot.data!.docs[index]['Blood Group'],
+                                      style: const TextStyle(
+                                        fontSize: 18.0,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -267,16 +349,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               horizontal: 10,
                             ),
                             child: Card(
-                              elevation: 15,
+                              elevation: 5,
                               borderOnForeground: true,
-                              child: ListTile(
-                                leading: const Icon(Icons.location_city),
-                                iconColor: Colors.orange,
-                                title: Text(
-                                  snapshot.data!.docs[index]['City'],
-                                  style: const TextStyle(
-                                    color: Colors.orange,
-                                    fontSize: 20.0,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10.0),
+                                child: ListTile(
+                                  leading: const Icon(Icons.location_city),
+                                  iconColor: Colors.red,
+                                  title: const Text(
+                                    'City',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20.0,
+                                    ),
+                                  ),
+                                  subtitle: Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 10.0, left: 40),
+                                    child: Text(
+                                      snapshot.data!.docs[index]['City'],
+                                      style: const TextStyle(
+                                        fontSize: 18.0,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -288,16 +385,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               horizontal: 10,
                             ),
                             child: Card(
-                              elevation: 15,
+                              elevation: 5,
                               borderOnForeground: true,
-                              child: ListTile(
-                                leading: const Icon(Icons.area_chart),
-                                iconColor: Colors.deepOrange,
-                                title: Text(
-                                  snapshot.data!.docs[index]['Area'],
-                                  style: const TextStyle(
-                                    color: Colors.deepOrange,
-                                    fontSize: 20.0,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10.0),
+                                child: ListTile(
+                                  leading: const Icon(Icons.area_chart),
+                                  iconColor: Colors.red,
+                                  title: const Text(
+                                    'Area',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20.0,
+                                    ),
+                                  ),
+                                  subtitle: Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 10.0, left: 40),
+                                    child: Text(
+                                      snapshot.data!.docs[index]['Area'],
+                                      style: const TextStyle(
+                                        fontSize: 18.0,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),

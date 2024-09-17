@@ -2,9 +2,9 @@
 import 'package:assignmen_1/Screens/Accepter/accepter_history.dart';
 import 'package:assignmen_1/Screens/Accepter/accepter_notification.dart';
 import 'package:assignmen_1/Screens/Accepter/map_screen.dart';
-import 'package:assignmen_1/Screens/Accepter/searchscreen.dart';
 import 'package:assignmen_1/Screens/selecttype.dart';
 import 'package:assignmen_1/repository/location_controller.dart';
+import 'package:assignmen_1/shared_pref/shared_pref.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -50,8 +50,23 @@ class Accepterhomestate extends State {
         child: ListView(
           children: <Widget>[
             UserAccountsDrawerHeader(
-              decoration: BoxDecoration(color: Colors.red),
-              accountName: Text(''),
+              decoration: const BoxDecoration(color: Colors.red),
+              currentAccountPicture: Container(
+                width: 170.0,
+                height: 170.0,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(
+                    color: Colors.red,
+                    width: 6.0,
+                  ),
+                  shape: BoxShape.circle,
+                  image: const DecorationImage(
+                    image: AssetImage('assets/images/accepter.png'),
+                  ),
+                ),
+              ),
+              accountName: const Text(''),
               accountEmail: Text(myaccepter),
             ),
             ListTile(
@@ -104,8 +119,9 @@ class Accepterhomestate extends State {
                 ' L o g o u t ',
                 style: TextStyle(fontSize: 18),
               ),
-              onTap: () {
-                FirebaseAuth.instance.signOut();
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                await SharedPrefClient().clearAcceptar();
                 Get.to(() => const Selected());
               },
             ),
@@ -150,7 +166,13 @@ class Accepterhomestate extends State {
                 ),
               ),
               onPressed: () {
-                Get.to(() => const SearchScreen());
+                // Get.to(() => const SearchScreen());
+
+                if (Singleton.instance.currentLat != 0.0) {
+                  Get.to(() => const MyMap());
+                } else {
+                  LocationController().getCurrentLocation(context);
+                }
               },
               child: const Text(
                 ' Search Donor',

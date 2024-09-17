@@ -1,10 +1,10 @@
 import 'dart:io';
-import 'package:assignmen_1/Screens/selecttype.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'Screens/selecttype.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,7 +42,7 @@ class MyAppstate extends State {
     // TODO: implement build
     return const GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Blood Donation Application',
+      title: 'Dynamic Location Based Blood Application',
       home: Selected(),
     );
   }

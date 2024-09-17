@@ -48,7 +48,7 @@ class Donornotificationstate extends State {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notifications'),
+        title: const Text('Requests'),
         backgroundColor: Colors.red,
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -96,9 +96,16 @@ class Donornotificationstate extends State {
                                           button2Enabled = false;
                                         });
                                         // Do something when button 1 is clicked
+                                        // String donorid = snapshot
+                                        //     .data!.docs[index]['Donorid'];
+                                        // String accepid = snapshot
+                                        //     .data!.docs[index]['Accepterid'];
                                         String penddingstatus = 'pendding';
                                         FirebaseFirestore.instance
                                             .collection('AccepterRequest')
+
+                                            // .where('Accepterid',
+                                            //     isEqualTo: accepid)
                                             .where('Donorid',
                                                 isEqualTo: mydonor)
                                             .get()
@@ -134,9 +141,17 @@ class Donornotificationstate extends State {
                                           button2Enabled = true;
                                         });
                                         // Do something when button 2 is clicked
+                                        // String donorid = snapshot
+                                        //     .data!.docs[index]['Donorid'];
+                                        // String accepid = snapshot
+                                        //     .data!.docs[index]['Accepterid'];
                                         String rejectstatus = 'rejected';
                                         FirebaseFirestore.instance
                                             .collection('AccepterRequest')
+                                            // .doc(accepid + "_" + donorid)
+                                            // .update({'Status': rejectstatus});
+                                            // .where('Accepterid',
+                                            //     isEqualTo: accepid)
                                             .where('Donorid',
                                                 isEqualTo: mydonor)
                                             .get()
@@ -147,6 +162,7 @@ class Donornotificationstate extends State {
                                             documentSnapshot.reference.update(
                                                 {'Status': rejectstatus});
                                           });
+
                                           Get.snackbar(
                                             'Rejected',
                                             'You have Rejected it',

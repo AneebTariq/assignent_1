@@ -33,23 +33,30 @@ class Accepterloginstate extends State {
   Widget build(BuildContext context) {
     // ignore: todo
     // TODO: implement
-    String accepteremail = '', accepterpassword = '';
+    // String accepteremail = '', accepterpassword = '';
     HomeControlleracc homecontroller = Get.put(HomeControlleracc());
-    // ignore: no_leading_underscores_for_local_identifiers
-    final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
     return Scaffold(
-      key: _scaffoldKey,
+      appBar: AppBar(
+        title: const Center(
+            child: Text(
+          'Login',
+          style: TextStyle(fontSize: 30),
+        )),
+        backgroundColor: Colors.red,
+      ),
       body: SingleChildScrollView(
         child: Form(
           key: homecontroller.accloginFormKey,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            //mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.only(top: 100.0),
+                padding: const EdgeInsets.only(top: 10.0),
                 child: Image.asset(
-                  'assets/images/donate.png',
+                  'assets/images/accep3.jpg',
                   height: 300,
+                  width: 400,
                 ),
               ),
               const SizedBox(
@@ -187,7 +194,7 @@ class Accepterloginstate extends State {
                   const Text('Do not have account?'),
                   TextButton(
                     onPressed: () {
-                      Get.to(const AccepterRegister());
+                      Get.to(() => const AccepterRegister());
                     },
                     child: const Text(
                       'Register',

@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Accepternotification extends StatefulWidget {
   const Accepternotification({super.key});
@@ -17,6 +16,7 @@ class Accepternotification extends StatefulWidget {
 
 class Accepternotificationstate extends State {
   final user = FirebaseAuth.instance.currentUser;
+
   @override
   Widget build(BuildContext context) {
     String? myaccepter = user?.email;
@@ -29,7 +29,7 @@ class Accepternotificationstate extends State {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notifications'),
+        title: const Text('Request Status'),
         backgroundColor: Colors.red,
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -71,6 +71,10 @@ class Accepternotificationstate extends State {
                                   ),
                                 ),
                                 onPressed: () {
+                                  String donorid =
+                                      snapshot.data!.docs[index]['Donorid'];
+                                  String accepid =
+                                      snapshot.data!.docs[index]['Accepterid'];
                                   String completedstatus = 'Completed';
                                   FirebaseFirestore.instance
                                       .collection('AccepterRequest')
@@ -102,7 +106,11 @@ class Accepternotificationstate extends State {
                                   ),
                                 ),
                                 onPressed: () {
-                                  String completedstatus = 'InCompleted';
+                                  // String donorid =
+                                  //     snapshot.data!.docs[index]['Donorid'];
+                                  // String accepid =
+                                  //     snapshot.data!.docs[index]['Accepterid'];
+                                  String incompletedstatus = 'InCompleted';
                                   FirebaseFirestore.instance
                                       .collection('AccepterRequest')
                                       .where('Accepterid',
@@ -112,8 +120,8 @@ class Accepternotificationstate extends State {
                                     querySnapshot.docs
                                         // ignore: avoid_function_literals_in_foreach_calls
                                         .forEach((documentSnapshot) {
-                                      documentSnapshot.reference
-                                          .update({'Status': completedstatus});
+                                      documentSnapshot.reference.update(
+                                          {'Status': incompletedstatus});
                                     });
                                   });
                                   Get.snackbar('InCompleted',

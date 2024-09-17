@@ -48,7 +48,7 @@ class Requesttodonorstate extends State {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
-    String? myaccepemail = myString;
+    String? myaccepemail = user?.email;
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(

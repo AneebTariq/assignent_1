@@ -59,8 +59,9 @@ class _SplashScreenState extends State<AccepterSplashScreen> {
   }
 
   void _checkSessionAndProceed() async {
-    bool status = await SharedPrefClient().isUserLoggedIn();
+    bool status = await SharedPrefClient().isAccepterLoggedIn();
 
+    print("user login check: $status");
     Timer(const Duration(seconds: 3), () {
       if (status) {
         Get.offAll(() => const AccepterHome());

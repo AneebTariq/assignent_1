@@ -18,51 +18,67 @@ class MyMap extends StatefulWidget {
 }
 
 class _MyMapState extends State<MyMap> {
-   LatLng? targetLatLng ;
-   BitmapDescriptor markerIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
+  LatLng? targetLatLng;
+  BitmapDescriptor markerIcon =
+      BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
 
-   List<int> distances=[];
+  List<int> distances = [];
 
-   // Step 1.
-   int dropdownValue = 1;
+  // Step 1.
+  int dropdownValue = 5;
 
-   List<int> distanceRanges=[1, 2,3,4,5,6,7,8,9,10,11,12];
+  List<int> distanceRanges = [
+    5,
+    10,
+    15,
+    20,
+    25,
+    30,
+    35,
+    40,
+    45,
+    50,
+    55,
+    60,
+    65,
+    70,
+    75,
+    80,
+    85,
+    90,
+    95,
+    100,
+  ];
 
-   List<String> bloodGroupList = [
-     'A+',
-     'B+',
-     'AB+',
-     'O+',
-     'A-',
-     'B-',
-     'AB-',
-     'O-',
-   ];
+  List<String> bloodGroupList = [
+    'A+',
+    'B+',
+    'AB+',
+    'O+',
+    'A-',
+    'B-',
+    'AB-',
+    'O-',
+  ];
 
-   String dropdownBloodValue = 'A+';
+  String dropdownBloodValue = 'A+';
 // Step 2.
 
-
   final Set<Marker> _markers = {};
-  LocationController controller=LocationController();
-   List<UserDonor>? donorList;
+  LocationController controller = LocationController();
+  List<UserDonor>? donorList;
 
-   final Singleton _singlton=Singleton();
+  final Singleton _singlton = Singleton();
 
   @override
   void initState() {
     // TODO: implement initState
-    targetLatLng=LatLng(_singlton.currentLat!,_singlton.currentLng!);
+    targetLatLng = LatLng(_singlton.currentLat!, _singlton.currentLng!);
     super.initState();
   }
 
-
-
-
-
-
-
   getDonorsList() async {
+    print("called getDonotList");
     _markers.clear();
     var customMarker = Marker(
         markerId: const MarkerId("currentLocation"),
@@ -74,50 +90,48 @@ class _MyMapState extends State<MyMap> {
         },
         icon: markerIcon);
     _markers.add(customMarker);
-     Donorrepository().alluser().then((donorList) async {
-       for (int i = 0; i < donorList.length; i++) {
+    Donorrepository().alluser().then((donorList) async {
+      for (int i = 0; i < donorList.length; i++) {
+        if (donorList[i].latitude != null && donorList[i].longitude != null) {
+          var distance = Geolocator.distanceBetween(
+              _singlton.currentLat!,
+              _singlton.currentLng!,
+              donorList[i].latitude!,
+              donorList[i].longitude!);
+          distance = distance / 1000;
+          print("blood groups are: ${donorList[i].Bloodgroup}");
+          print("donor list length is: ${donorList.length}");
+          if (distance <= dropdownValue &&
+              donorList[i].Bloodgroup == dropdownBloodValue) {
+            print("calculated distance:$distance");
+            print("dropdown $dropdownValue");
 
-         if (donorList[i].latitude != null && donorList[i].longitude != null) {
-           var distance = Geolocator.distanceBetween(_singlton.currentLat!, _singlton.currentLng!,
-               donorList[i].latitude!, donorList[i].longitude!);
-           distance=distance/1000;
-
-
-           if (distance <= dropdownValue && donorList[i].Bloodgroup==dropdownBloodValue) {
-             print("calculated distance:$distance");
-             print("dropdown $dropdownValue");
-             _markers.add(
-               // added markers
-                 Marker(
-                   markerId: MarkerId(i.toString()),
-                   position: LatLng(
-                       donorList[i].latitude!, donorList[i].longitude!),
-                   infoWindow: InfoWindow(
-                     title: donorList[i].Bloodgroup,
-                     snippet: donorList[i].address,
-                     onTap: (){
-                       print("marker tapped");
-                       String donorId = donorList[i].Donoremail;
-                       Get.to(() => const Requesttodonor(),
-                           arguments: MyPageArguments(
-                               donorid: donorId));
-
-                     }
-                   ),
-                   icon: BitmapDescriptor.defaultMarker,
-                 )
-             );
-           }
-         }
-         if (mounted) {
-           setState(() {});
-         }
-       }
-     });
-
+            _markers.add(
+                // added markers
+                Marker(
+              markerId: MarkerId(i.toString()),
+              position: LatLng(donorList[i].latitude!, donorList[i].longitude!),
+              infoWindow: InfoWindow(
+                  title: donorList[i].Bloodgroup,
+                  snippet: donorList[i].address,
+                  onTap: () {
+                    print("marker tapped");
+                    String donorId = donorList[i].Donoremail;
+                    print("donar id is : ${donorList[i].Donoremail}");
+                    Get.to(const Requesttodonor(),
+                        arguments: MyPageArguments(donorid: donorId));
+                  }),
+              icon: BitmapDescriptor.defaultMarker,
+            ));
+            setState(() {});
+          }
+        }
+        if (mounted) {
+          setState(() {});
+        }
+      }
+    });
   }
-
-
 
   void _onMapCreated(GoogleMapController controller) {
     setState(() {
@@ -136,8 +150,7 @@ class _MyMapState extends State<MyMap> {
               myLocationEnabled: true,
               onMapCreated: _onMapCreated,
               initialCameraPosition: CameraPosition(
-
-                target:targetLatLng!,
+                target: targetLatLng!,
                 zoom: 11.0,
               ),
               markers: _markers,
@@ -148,10 +161,11 @@ class _MyMapState extends State<MyMap> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(onPressed: (){
-                    Get.back();
-                  }, icon: const Icon(Icons.arrow_back)),
-
+                  IconButton(
+                      onPressed: () {
+                        Get.back();
+                      },
+                      icon: const Icon(Icons.arrow_back)),
                   Container(
                     color: Colors.white10,
                     child: DropdownButton<String>(
@@ -163,7 +177,8 @@ class _MyMapState extends State<MyMap> {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
                             child: Text(
                               value,
                               style: const TextStyle(fontSize: 16),
@@ -191,7 +206,8 @@ class _MyMapState extends State<MyMap> {
                         return DropdownMenuItem<int>(
                           value: value,
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
                             child: Text(
                               "$value km",
                               style: const TextStyle(fontSize: 16),

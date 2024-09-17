@@ -31,12 +31,20 @@ class DonorLoginstate extends State {
     String donoremail = '', donorpassword = '';
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Center(
+            child: Text(
+          'Login',
+          style: TextStyle(fontSize: 30),
+        )),
+        backgroundColor: Colors.red,
+      ),
       body: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          // mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.only(top: 100.0),
+              padding: const EdgeInsets.only(top: 20.0),
               child: Image.asset(
                 'assets/images/donate.png',
                 height: 300,
@@ -132,14 +140,20 @@ class DonorLoginstate extends State {
                 onPressed: () async {
                   try {
                     // ignore: unused_local_variable
+                    print("Entered into login area:");
                     final credential =
                         await FirebaseAuth.instance.signInWithEmailAndPassword(
                       email: donoremail,
                       password: donorpassword,
                     );
-                    await SharedPrefClient().setUser(DonorUserModel(
-                        credential.user!.uid, credential.user!.email!));
-                    Get.offAll(() => const ProfileScreen());
+                    if (credential.user?.uid != null) {
+                      print("entered into credential check of login:");
+                      await SharedPrefClient().setUser(DonorUserModel(
+                          credential.user!.uid, credential.user!.email!));
+                      Get.offAll(() => const ProfileScreen());
+                    } else {
+                      print("entered into else print:");
+                    }
                   } on FirebaseAuthException catch (e) {
                     if (e.code == 'user-not-found') {
                       print('No user found for that email.');
@@ -171,7 +185,7 @@ class DonorLoginstate extends State {
                 const Text('Do not have account?'),
                 TextButton(
                   onPressed: () {
-                    Get.to(() => const DonorRegister());
+                    Get.off(() => const DonorRegister());
                   },
                   child: const Text(
                     'Register',

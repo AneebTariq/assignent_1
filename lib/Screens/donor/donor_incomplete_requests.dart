@@ -1,19 +1,19 @@
 // ignore_for_file: prefer_interpolation_to_compose_strings
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class Donorhistory extends StatefulWidget {
-  const Donorhistory({super.key});
+class Donorincomphistory extends StatefulWidget {
+  const Donorincomphistory({super.key});
 
   @override
   State<StatefulWidget> createState() {
-    return Donorhistorystate();
+    return Donornotificationstate();
   }
 }
 
-class Donorhistorystate extends State {
-  //final user = FirebaseAuth.instance.currentUser;
+class Donornotificationstate extends State {
   String myString = '';
 
   @override
@@ -34,17 +34,17 @@ class Donorhistorystate extends State {
 
   @override
   Widget build(BuildContext context) {
-    // String? myaccepter = user?.email;
     String myaccepter = myString;
-
+    String getstatus = 'InCompleted';
     final Query<Map<String, dynamic>> usersCollection = FirebaseFirestore
         .instance
         .collection('AccepterRequest')
-        .where('Donorid', isEqualTo: myaccepter);
+        .where('Donorid', isEqualTo: myaccepter)
+        .where('Status', isEqualTo: getstatus);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Request History'),
+        title: const Text('Incomplete Requestes'),
         backgroundColor: Colors.red,
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -78,8 +78,6 @@ class Donorhistorystate extends State {
                             subtitle: Text('Address: ' +
                                 snapshot.data!.docs[index]['Address']),
                           ),
-                          Text('DonorEmail: ' +
-                              snapshot.data!.docs[index]['Donorid']),
                         ],
                       ),
                     ),

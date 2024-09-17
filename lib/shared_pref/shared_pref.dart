@@ -12,6 +12,12 @@ class SharedPrefClient {
     return userToken != null;
   }
 
+  Future<bool> isAccepterLoggedIn() async {
+    final sharedPref = await SharedPreferences.getInstance();
+    final userToken = sharedPref.getString(accepteruserId);
+    return userToken != null;
+  }
+
   Future<DonorUserModel> getUser() async {
     final sharedPref = await SharedPreferences.getInstance();
     final id = sharedPref.getString(donoruserId);
@@ -28,6 +34,11 @@ class SharedPrefClient {
   Future<void> clearUser() async {
     final sharedPref = await SharedPreferences.getInstance();
     await sharedPref.remove(donoruserId);
+  }
+
+  Future<void> clearAcceptar() async {
+    final sharedPref = await SharedPreferences.getInstance();
+    await sharedPref.remove(accepteruserId);
   }
 
   //accepter shared prefrances

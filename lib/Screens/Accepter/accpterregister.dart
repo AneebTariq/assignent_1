@@ -34,16 +34,24 @@ class Accepterregisterstate extends State {
     // TODO: implement build
     String accepteremail = '', accepterpassword = '';
     return Scaffold(
+      appBar: AppBar(
+        title: const Center(
+            child: Text(
+          'Sign Up',
+          style: TextStyle(fontSize: 30),
+        )),
+        backgroundColor: Colors.red,
+      ),
       body: SingleChildScrollView(
         child: Form(
           key: homecontroller.accregisterFormKey,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            // mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.only(top: 100.0),
+                padding: const EdgeInsets.only(top: 20.0),
                 child: Image.asset(
-                  'assets/images/donor.png',
+                  'assets/images/accept.png',
                   height: 300,
                 ),
               ),
